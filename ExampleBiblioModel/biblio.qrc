@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="table">document-open.svg</file>
+        <file alias="edit">mail-send.svg</file>
+    </qresource>
+    <qresource prefix="/lang">
+        <file alias="epo">biblio_epo.qm</file>
+        <file alias="far">biblio_far.qm</file>
+        <file alias="rus">biblio_rus.qm</file>
+    </qresource>
+</RCC>
