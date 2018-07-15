@@ -1,1 +1,1 @@
-ExampleBiblioModel - учебный проект.
+ExampleBiblioModel - СѓС‡РµР±РЅС‹Р№ РїСЂРѕРµРєС‚.
