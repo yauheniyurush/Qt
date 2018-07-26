@@ -26,8 +26,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    application.cpp
+    application.cpp \
+    catitemedit.cpp \
+    dialogtpl.cpp
 
 HEADERS += \
         mainwindow.h \
-    application.h
+    application.h \
+    catitemedit.h \
+    dialogtpl.h
+
+FORMS += \
+buttonsframe.ui \
+catitemframe.ui
