@@ -5,19 +5,29 @@
 
 namespace STORE {
 
+/************************************************************************/
+
 ButtonsDlg::ButtonsDlg(QWidget *parent) :QFrame (parent) {
     ui.setupUi(this);
     connect (ui.btnOk, SIGNAL(clicked()),this,SIGNAL(accepted()));
     connect (ui.btnCancel, SIGNAL(clicked()),this,SIGNAL(rejected()));
 }
 
-ButtonsDlg::~ButtonsDlg(){}
+/************************************************************************/
+
+ButtonsDlg::~ButtonsDlg(){
+
+}
+
+/************************************************************************/
 
 void ButtonsDlg::error_message(const QString &msg) {
     ui.lblMsg->setText(msg);
 }
 
-CommonDialog::CommonDialog(QWidget *parent) :QDialog (parent){
+/************************************************************************/
+
+CommonDialog::CommonDialog(QWidget *parent) :QDialog (parent) {
 
     QVBoxLayout *L = new QVBoxLayout (this );
 
@@ -32,15 +42,20 @@ CommonDialog::CommonDialog(QWidget *parent) :QDialog (parent){
 
 }
 
+/************************************************************************/
+
 CommonDialog::~CommonDialog(){
 
 }
+
+/************************************************************************/
 
 void CommonDialog::setCentralFrame(QFrame *central) {
 
     QVBoxLayout *L = qobject_cast<QVBoxLayout*>(layout());
 
     central->setParent(this);
+
     pFrame=central;
 
     L->insertWidget(0, pFrame) ;
@@ -51,13 +66,24 @@ void CommonDialog::setCentralFrame(QFrame *central) {
     connect(this, SIGNAL(check_data(bool*)),
             pFrame, SLOT(is_good(bool *)));
 
+    connect(this, SIGNAL(save()),
+            pFrame, SLOT(save()));
+
 
 }
+
+/************************************************************************/
 
 void CommonDialog::accept_pressed() {
     bool OK = true;
     emit check_data(&OK);
-    if (OK) accept();
+    if (OK) {
+        emit save();
+        accept();
+    }
+
 }
+
+/************************************************************************/
 
 } //namespace STORE

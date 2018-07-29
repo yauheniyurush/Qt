@@ -48,6 +48,7 @@ public:
 
 signals:
     void check_data(bool *pOK);
+    void save() ;
 
 };
 

@@ -28,13 +28,17 @@ SOURCES += \
         mainwindow.cpp \
     application.cpp \
     catitemedit.cpp \
-    dialogtpl.cpp
+    dialogtpl.cpp \
+    catalogue.cpp \
+    posaction.cpp
 
 HEADERS += \
         mainwindow.h \
     application.h \
     catitemedit.h \
-    dialogtpl.h
+    dialogtpl.h \
+    catalogue.h \
+    posaction.h
 
 FORMS += \
 buttonsframe.ui \

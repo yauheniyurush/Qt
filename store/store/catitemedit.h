@@ -2,8 +2,8 @@
 #define CATITEMEDIT_H
 
 #include "ui_catitemframe.h"
-#include <QFrame>
 
+#include <QFrame>
 #include "dialogtpl.h"
 
 namespace STORE {
@@ -18,10 +18,13 @@ class Data : public QObject {
     Q_OBJECT
 
 public:
+    Data(QObject *parent=0):QObject(parent) {}
+
     QString   Code   ;
     QString   Title  ;
     QDateTime From   ;
     QDateTime To     ;
+    QString   Comment;
     bool      IsLocal;
     Data      *pParentItem ;
 };
@@ -39,8 +42,24 @@ public:
 private:
   Ui::CatItemFrame ui;
 
+public:
+  Data *Block ;
+
+public:
+  void setDataBlock(Data *D) {
+      Block = D;
+      load();
+  }
+
 public slots:
   void is_good(bool *pOK);
+  void load() ;//perenos inf s dannih na dialog
+  bool save() ;//perenos inf s dialoga na dannie
+
+signals:
+  void error_message(const QString &);
+
+
 
 };
 
@@ -55,6 +74,9 @@ private:
 public:
     Dialog(QWidget *parent=0);
     virtual ~Dialog();
+
+public:
+    void setDataBlock(Data *D){ pFrame->setDataBlock(D); }
 
 };
 
