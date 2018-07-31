@@ -2,6 +2,8 @@
 
 #include <QAction>
 #include <QMenu>
+#include <QtSql>
+
 
 #include "posaction.h"
 
@@ -10,14 +12,39 @@ namespace Catalogue {
 
 /****************************************************************************/
 
-class PositionedAction : public QAction {
-    Q_OBJECT
-};
-/****************************************************************************/
-
 Model::Model(QObject *parent) : QAbstractTableModel(parent) {
 
+
+    QSqlQuery qry;
+    qry.setForwardOnly(true);
+    qry.prepare( "select      \n"
+                   "iid,        \n"
+                   "Code,       \n"
+                   "Title,      \n"
+                   "valid_from, \n"
+                   "valid_to,   \n"
+                   "is_local,   \n"
+                   "acomment,   \n"
+                   "rid_parent, \n"
+                   "alevel      \n"
+                   "from catalogue;");
+    if (qry.exec()) {
+        while(qry.next()){
+            Item::Data *D = new Item::Data(this, qry);
+            Cat.append(D);
+        }
+    } else {
+        qCritical() << "Error";
+        QSqlError Err = qry.lastError();
+        qCritical() << Err.nativeErrorCode();
+        qCritical() << Err.databaseText().toUtf8().data();
+        qCritical() << Err.driverText().toUtf8().data();
+
+    }
+
+
     //Это тестовый каталог. Заменить на настоящий
+    /*
     {
         Item::Data *D = new Item::Data(this);
         D->Code = "111";
@@ -59,7 +86,7 @@ Model::Model(QObject *parent) : QAbstractTableModel(parent) {
         D->IsLocal = false ;
         D->Comment = "Проверить правильность";
         Cat.append(D);
-    }
+    }*/
 
 }
 

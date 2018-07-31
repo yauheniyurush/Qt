@@ -6,6 +6,9 @@
 #include <QFrame>
 #include "dialogtpl.h"
 
+
+class QSqlQuery;
+
 namespace STORE {
 namespace Catalogue {
 namespace Item {
@@ -19,7 +22,8 @@ class Data : public QObject {
 
 public:
     Data(QObject *parent=0):QObject(parent) {}
-
+    Data(QObject *parent, QSqlQuery &qry);
+    QVariant  Id     ;
     QString   Code   ;
     QString   Title  ;
     QDateTime From   ;

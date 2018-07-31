@@ -1,8 +1,27 @@
 #include "catitemedit.h"
 
+#include <QtSql>
+
 namespace STORE {
 namespace Catalogue {
 namespace Item {
+
+/*************************************************************/
+
+Data::Data(QObject *parent, QSqlQuery &qry)
+    : QObject(parent) {
+
+    Id      = qry.value("iid"       ) ;
+    Code    = qry.value("code"      ).toString() ;
+    Title   = qry.value("Title"     ).toString() ;
+    From    = qry.value("valid_from").toDateTime() ;
+    To      = qry.value("valid_to"  ).toDateTime() ;
+    IsLocal = qry.value("is_local"  ).toBool() ;
+    Comment = qry.value("acomment"   ).toString() ;
+    pParentItem = 0;
+
+}
+/*************************************************************/
 
 Frame::Frame(QWidget *parent) :QFrame(parent){
 
