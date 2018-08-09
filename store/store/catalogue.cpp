@@ -1,4 +1,4 @@
-#include "catalogue.h"
+﻿#include "catalogue.h"
 
 #include <QAction>
 #include <QMenu>
@@ -13,7 +13,6 @@ namespace Catalogue {
 /****************************************************************************/
 
 Model::Model(QObject *parent) : QAbstractTableModel(parent) {
-
 
     QSqlQuery qry;
     qry.setForwardOnly(true);
@@ -119,8 +118,8 @@ QVariant Model::dataDisplay(const QModelIndex &I) const{
     switch (I.column() ) {
       case 0 : return D->Code ;
       case 1 : return D->Title ;
-      case 2 : return D->From ;
-      case 3 : return D->To ;
+      case 2 : return D->From.isValid() ? D->From.toString("dd.MM.yyyy") : "" ;
+      case 3 : return D->To.isValid() ? D->To.toString("dd.MM.yyyy") : "" ;
       case 4 : return D->IsLocal ? tr("LOCAL") : QString() ;
       case 5 : return D->Comment.isEmpty() ? QString() : tr("CMT") ;
       default : return QVariant();
@@ -139,11 +138,58 @@ Item::Data * Model::dataDataBlock(const QModelIndex &I) const {
     return Cat[R];
 }
 
+QVariant Model::dataFont(const QModelIndex &I) const {
+    Item::Data *D = dataDataBlock(I);
+    if (!D) return QVariant();
+    QFont F;
+    if (D->Deleted) F.setStrikeOut(true);
+    return F;
+}
+
+QVariant Model::dataForeground(const QModelIndex &I) const {
+    Item::Data *D = dataDataBlock(I);
+    if (!D) return QVariant();
+    QColor Result = D->IsLocal ? QColor("blue") : QColor ("black") ;
+    if (!D->isActive()) Result.setAlphaF(1.0/3.0);
+    return Result;
+    //if (!(D->To.isValid())) return QVariant();
+    //if (D->To > QDateTime::currentDateTime()) {
+    //    if (D->IsLocal) return QColor("#0000FF");
+    //    else return QColor("#000000");
+    //}
+    //else {
+    //    return QColor("#AAAAAA");
+    //}
+
+}
+
+QVariant Model::dataToolTip(const QModelIndex &I) const {
+    Item::Data *D = dataDataBlock(I);
+    if (!D) return QVariant();
+    switch (I.column()) case 2:{
+        if (!D->To.isValid()) return QVariant();
+        return tr("Valid to %1").arg(D->To.toString("dd.MM.yyyy"));
+
+    default : return QVariant();
+    }
+
+    return QVariant("ToolTip");
+}
+
 QVariant Model::data(const QModelIndex &I, int role) const {
 
     switch (role) {
-      case Qt::DisplayRole : return dataDisplay(I);
+      case Qt::DisplayRole       : return dataDisplay(I);
       case Qt::TextAlignmentRole : return dataTextAlignment(I);
+      case Qt::ForegroundRole    : return dataForeground(I);
+      case Qt::FontRole          : return dataFont(I);
+      case Qt::ToolTipRole          : return dataToolTip(I);
+      //case Qt::UserRole          : return QVariant(dataDataBlock(I));
+      case Qt::UserRole+1          : {
+        Item::Data *D =dataDataBlock(I);
+        if (!D) return false;
+        return D->Deleted;
+    }
       default : return QVariant();
     }
 
@@ -185,6 +231,21 @@ QVariant Model::headerData(int section,
 
 }
 
+void Model::delItem( const QModelIndex &I, QWidget *parent){
+    //спросить у пользователя уверен ли он что хочет удалить элемент
+    Item::Data *D = dataDataBlock(I);
+    if (!D) return;
+    //to do исходим из того что модель линейна
+    beginResetModel();//модель отправляет всем представлениям связанным с данной моделью сигнал о том что данные редактируются и представления не могут запрашивать данные на редактирование
+    if (D->Id.isNull() || !D->Id.isValid()) {
+    Cat.removeAt(I.row());
+    delete D;
+    } else {
+        D->Deleted = ! D->Deleted;
+    }
+    endResetModel();//окончание редактирвоания данных
+}
+
 void Model::editItem( const QModelIndex &I, QWidget *parent){
     Item::Dialog Dia( parent );
     Item::Data *D = dataDataBlock(I);
@@ -195,6 +256,27 @@ void Model::editItem( const QModelIndex &I, QWidget *parent){
     endResetModel();//окончание редактирвоания данных
 }
 
+void Model::newItem( const QModelIndex &parentI, QWidget *parent){
+    if (parentI.isValid()) {
+        //Сделать добавление нового элемента не обязательно в корень каталога
+        qWarning()<<"Cannot add non top-level item";
+        return;
+    }
+    Item::Data *D = new Item::Data(this);
+    if (!D) {
+        qWarning() << "Cannot create new item";
+        return;
+    }
+    Item::Dialog Dia( parent );
+    Dia.setDataBlock(D);
+    if (Dia.exec() == QDialog::Accepted) {
+        beginResetModel();//модель отправляет всем представлениям связанным с данной моделью сигнал о том что данные редактируются и представления не могут запрашивать данные на редактирование
+        Cat.append(D);
+        endResetModel();//окончание редактирвоания данных
+    } else {
+        delete D;
+    }
+}
 /****************************************************************************/
 TableView::TableView(QWidget *parent) :QTableView(parent){
 
@@ -219,12 +301,31 @@ TableView::TableView(QWidget *parent) :QTableView(parent){
             this,SLOT(contextMenuRequested(QPoint)));
 
     {
+        PosAction *A = actDelItem = new PosAction(this);
+        A->setText(tr("delete"));
+        connect(A,SIGNAL(editItem(QModelIndex,QWidget*)),
+                M,SLOT(delItem(QModelIndex,QWidget*)) );
+        addAction(A);
+    }
+
+    {
+        PosAction *A = actNewItem = new PosAction(this);
+        A->setText(tr("add"));
+        connect(A,SIGNAL(editItem(QModelIndex,QWidget*)),
+                M,SLOT(newItem(QModelIndex,QWidget*)) );
+        addAction(A);
+    }
+
+    {
         PosAction *A = actEditItem =new PosAction(this);
         A->setText(tr("Edit"));
         connect(A,SIGNAL(editItem(QModelIndex,QWidget*)),
                 M,SLOT(editItem(QModelIndex,QWidget*)) );
         addAction(A);
     }
+    //скрытие колонки
+    setColumnHidden(3, true);
+    setColumnHidden(4, true);
 
 }
 
@@ -241,10 +342,23 @@ void TableView::contextMenuRequested(const QPoint &p) {
     QMenu M(this);
     QModelIndex I = indexAt(p);
     if (I.isValid()) {
+        actDelItem->I=I;
+        actDelItem->pWidget=this;
+        if (I.data(Qt::UserRole+1).toBool() ) {
+            actDelItem->setText(tr("Restore"));
+        }  else
+        {
+           actDelItem->setText(tr("Delete"));
+        }
+        M.addAction(actDelItem);
         actEditItem->I=I;
         actEditItem->pWidget = this;
         M.addAction(actEditItem);
+
     }
+    actNewItem->I=QModelIndex();
+    actNewItem->pWidget=this;
+    M.addAction(actNewItem);
     M.exec(mapToGlobal(p));
 }
 /****************************************************************************/

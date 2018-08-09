@@ -21,7 +21,7 @@ class Data : public QObject {
     Q_OBJECT
 
 public:
-    Data(QObject *parent=0):QObject(parent) {}
+    Data(QObject *parent=0):QObject(parent), IsLocal(true), pParentItem(0), Deleted(false) {}
     Data(QObject *parent, QSqlQuery &qry);
     QVariant  Id     ;
     QString   Code   ;
@@ -31,6 +31,8 @@ public:
     QString   Comment;
     bool      IsLocal;
     Data      *pParentItem ;
+    bool    Deleted;
+    bool    isActive() const;
 };
 
 

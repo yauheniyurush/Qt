@@ -19,6 +19,7 @@ Data::Data(QObject *parent, QSqlQuery &qry)
     IsLocal = qry.value("is_local"  ).toBool() ;
     Comment = qry.value("acomment"   ).toString() ;
     pParentItem = 0;
+    Deleted = false;
 
 }
 /*************************************************************/
@@ -86,6 +87,17 @@ Dialog::Dialog(QWidget *parent)
 
 Dialog::~Dialog(){
 
+}
+
+bool Data::isActive() const {
+    if (!From.isValid()) {
+        if (From > QDateTime:: currentDateTime())
+        return false;
+    }
+    if (To.isValid()) {
+        if (To<QDateTime::currentDateTime()) return false;
+    }
+    return true;
 }
 
 }//namespace Item
