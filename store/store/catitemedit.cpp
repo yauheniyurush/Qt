@@ -17,7 +17,7 @@ Data::Data(QObject *parent, QSqlQuery &qry)
     From    = qry.value("valid_from").toDateTime() ;
     To      = qry.value("valid_to"  ).toDateTime() ;
     IsLocal = qry.value("is_local"  ).toBool() ;
-    Comment = qry.value("acomment"   ).toString() ;
+    Comment = qry.value("acomment"  ).toString() ;
     pParentItem = 0;
     Deleted = false;
 
@@ -98,6 +98,37 @@ bool Data::isActive() const {
         if (To<QDateTime::currentDateTime()) return false;
     }
     return true;
+}
+
+Data * List::findPointer(int Id) const {
+    Data *D;
+    foreach(D, *this){
+        bool OK;
+        int cId = D->Id.toInt(&OK);
+        if (OK && cId == Id) return D;
+        Data *R = D->Children.findPointer(Id);
+        if ( R ) return R;
+    }
+    return 0;
+}
+
+bool Data::isNew() const {
+
+    if (! Id.isValid()) return true;
+    if (Id.isNull()) return true;
+    return false;
+}
+/*******************************************************************/
+//
+bool Data::isSameAs( Data *D) const {
+
+    if (isNew()) {
+        if (!D->isNew()) return false;
+        return property("temp_id")==D->property("temp_id");
+    } else {
+        if (D->isNew()) return false;
+        return D->Id == Id ;
+    }
 }
 
 }//namespace Item

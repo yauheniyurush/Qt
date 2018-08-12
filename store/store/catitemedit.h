@@ -9,11 +9,18 @@
 
 class QSqlQuery;
 
+
 namespace STORE {
 namespace Catalogue {
 namespace Item {
 
 /***************************************************/
+class Data;
+class List : public QList<Data*> {
+public:
+    List() : QList<Data*>() {}
+    Data * findPointer(int Id) const ;
+};
 
 
 class Data : public QObject {
@@ -30,9 +37,14 @@ public:
     QDateTime To     ;
     QString   Comment;
     bool      IsLocal;
-    Data      *pParentItem ;
-    bool    Deleted;
-    bool    isActive() const;
+    Data      *pParentItem;
+    bool      Deleted     ;
+    List      Children    ;
+public:
+    bool      isActive() const;
+    bool      isNew() const   ;
+    //проверяет одинаковый ли текущий объект класса Data с переданным объектом D
+    bool      isSameAs(Data * D) const;
 };
 
 
