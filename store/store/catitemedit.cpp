@@ -7,7 +7,7 @@ namespace Catalogue {
 namespace Item {
 
 /*************************************************************/
-
+//конструктор объекта со строкой данных
 Data::Data(QObject *parent, QSqlQuery &qry)
     : QObject(parent) {
 
@@ -20,6 +20,7 @@ Data::Data(QObject *parent, QSqlQuery &qry)
     Comment = qry.value("acomment"  ).toString() ;
     pParentItem = 0;
     Deleted = false;
+    Changed = false;
 
 }
 /*************************************************************/
@@ -73,6 +74,7 @@ bool Frame::save() {
     else {
         Block->To = QDateTime();
     }
+    Block->Changed = true;
      return true;
 }
 

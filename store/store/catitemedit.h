@@ -40,6 +40,7 @@ public:
     Data      *pParentItem;
     bool      Deleted     ;
     List      Children    ;
+    bool      Changed     ; //параметр показывает редактировался ли объект
 public:
     bool      isActive() const;
     bool      isNew() const   ;
@@ -49,6 +50,7 @@ public:
 
 
 /***************************************************/
+//организация фрейма на диалоге
 class Frame : public QFrame {
 
     Q_OBJECT
@@ -71,8 +73,8 @@ public:
 
 public slots:
   void is_good(bool *pOK);
-  void load() ;//perenos inf s dannih na dialog
-  bool save() ;//perenos inf s dialoga na dannie
+  void load() ;//перенос инф с данных на диалог
+  bool save() ;//перенос инф с диалога на данные
 
 signals:
   void error_message(const QString &);

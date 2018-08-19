@@ -30,7 +30,8 @@ SOURCES += \
     catitemedit.cpp \
     dialogtpl.cpp \
     catalogue.cpp \
-    posaction.cpp
+    posaction.cpp \
+    books.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -38,7 +39,8 @@ HEADERS += \
     catitemedit.h \
     dialogtpl.h \
     catalogue.h \
-    posaction.h
+    posaction.h \
+    books.h
 
 FORMS += \
 buttonsframe.ui \
