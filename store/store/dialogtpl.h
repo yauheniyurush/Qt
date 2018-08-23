@@ -52,6 +52,8 @@ signals:
 
 };
 
+
+
 }//namespace  STORE
 
 #endif // DIALOGTPL_H

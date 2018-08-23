@@ -781,6 +781,21 @@ ColumnView::~ColumnView(){
 
 }
 
+void ColumnView::currentChanged(const QModelIndex &current,
+                                const QModelIndex &previos){
+    QColumnView::currentChanged(current, previos);
+    if ( ! current.isValid()) {
+        emit item_selected(QVariant());
+        return;
+    }
+    Item::Data *D = (Item::Data*)(current.internalPointer());
+    if (!D) {
+        emit item_selected(QVariant());
+        return;
+    }
+    emit item_selected(D->Id);
+}
+
 
 
 }//Catalogue

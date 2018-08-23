@@ -31,7 +31,8 @@ SOURCES += \
     dialogtpl.cpp \
     catalogue.cpp \
     posaction.cpp \
-    books.cpp
+    books.cpp \
+    filter.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -40,8 +41,10 @@ HEADERS += \
     dialogtpl.h \
     catalogue.h \
     posaction.h \
-    books.h
+    books.h \
+    filter.h
 
 FORMS += \
 buttonsframe.ui \
-catitemframe.ui
+catitemframe.ui \
+    filter.ui
